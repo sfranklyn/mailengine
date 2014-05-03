@@ -1,0 +1,1105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.7" />
+<title>Mail Engine</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+tt {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+.monospaced {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install();
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>Mail Engine</h1>
+<span id="author">Samuel Franklyn</span><br />
+<span id="email"><tt>&lt;<a href="mailto:sfranklyn@gmail.com">sfranklyn@gmail.com</a>&gt;</tt></span><br />
+<span id="revnumber">version 1.0,</span>
+<span id="revdate">2013-12</span>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_pengantar">Pengantar</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Mail engine adalah program Java yang memungkinkan program RPG di AS/400 untuk
+mengirimkan email dengan mudah. Program Java di PC akan membaca data queue
+di AS/400. Jika ada data dalam data queue maka akan dikirimkan email berdasarkan
+data tersebut. Program RPG di AS/400 hanya perlu menuliskan data ke dalam
+data queue untuk mengirimkan email.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_perangkat_lunak">Perangkat Lunak</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Dalam menuliskan program digunakan perangkat lunak berikut:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Java SDK versi 7
+</p>
+</li>
+<li>
+<p>
+Maven versi 3.1.1
+</p>
+</li>
+<li>
+<p>
+NetBeans 8
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Silahkan melakukan instalasi perangkat lunak diatas sesuai dengan petunjuk
+dari situs mereka.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mail_engine">Mail Engine</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Untuk melakukan test program maka penulis membuat library MAIL di AS/400.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>===&gt;CRTLIB MAIL</tt></pre>
+</div></div>
+<div class="paragraph"><p>Sesudah itu dibuat data queue.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>===&gt;CRTDTAQ DTAQ(MAIL/MAILQ) MAXLEN(1000)</tt></pre>
+</div></div>
+<div class="paragraph"><p>Jadikan library MAIL sebagai current library dan buat source file QSRC.
+Masuk ke dalam source file itu dengan WRKMBRPDM. Buatlah member PGSEND dengan
+tipe RPGLE.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>===&gt;CHGCURLIB MAIL
+===&gt;CRTSRCPF FILE(QSRC)
+===&gt;WRKMBRPDM FILE(MAIL/QSRC)
+===&gt;STRSEU SRCFILE(MAIL/QSRC) SRCMBR(PGSEND) TYPE(RPGLE)</tt></pre>
+</div></div>
+<div class="paragraph"><p>Lalu masukkan code berikut:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>     D QNAME           S             10A   INZ('MAILQ')
+     D LIB             S             10A   INZ('MAIL')
+     D QLEN            S              5  0 INZ(1000)
+      *
+     D MAILDS          DS
+     D  FROM                        100A
+     D  TO                          100A
+     D  SUBJECT                     100A
+     D  TEXT                        700A
+      *
+     C                   EVAL       FROM='sfranklyn@gmail.com'
+     C                   EVAL       TO='sfranklyn@gmail.com'
+     C                   EVAL       SUBJECT='Send mail from RPG'
+     C                   EVAL       TEXT='It Works'
+      *
+     C                   CALL      'QSNDDTAQ'
+     C                   PARM                    QNAME
+     C                   PARM                    LIB
+     C                   PARM                    QLEN
+     C                   PARM                    MAILDS
+      *
+     C                   EVAL      *INLR=*ON
+     C                   RETURN</tt></pre>
+</div></div>
+<div class="paragraph"><p>Refresh tampilan anda dengan F5 lalu compile member PGSEND dengan menggunakan
+option 14.</p></div>
+<div class="paragraph"><p>Saatnya membuat program java anda dengan menggunakan Maven. Jalankan perintah
+berikut di command line</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ mvn archetype:generate \
+   -DarchetypeGroupId=org.apache.maven.archetypes \
+   -DarchetypeArtifactId=maven-archetype-quickstart \
+   -DarchetypeVersion=1.1</tt></pre>
+</div></div>
+<div class="paragraph"><p>Isi nilai groupId dengan com.gamya, nilai artifactId dengan mailengine,
+nilai version dengan 1.0 dan nilai package dengan com.gamya.mailengine.
+Maven akan membuat file pom.xml, source file App.java dan AppTest.java.
+Hapuslah source file App.java dan AppTest.java.
+Sesuaikan isi file pom.xml anda hingga seperti dibawah ini:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;groupId&gt;com.gamya&lt;/groupId&gt;
+    &lt;artifactId&gt;mailengine&lt;/artifactId&gt;
+    &lt;version&gt;1.0&lt;/version&gt;
+    &lt;packaging&gt;jar&lt;/packaging&gt;
+
+    &lt;name&gt;mailengine&lt;/name&gt;
+    &lt;url&gt;http://maven.apache.org&lt;/url&gt;
+
+    &lt;properties&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+        &lt;maven.compiler.source&gt;1.7&lt;/maven.compiler.source&gt;
+        &lt;maven.compiler.target&gt;1.7&lt;/maven.compiler.target&gt;
+    &lt;/properties&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+                &lt;artifactId&gt;exec-maven-plugin&lt;/artifactId&gt;
+                &lt;version&gt;1.2.1&lt;/version&gt;
+                &lt;configuration&gt;
+                    &lt;mainClass&gt;com.gamya.mailengine.MailEngine&lt;/mainClass&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;
+                &lt;version&gt;2.4&lt;/version&gt;
+                &lt;configuration&gt;
+                    &lt;archive&gt;
+                        &lt;manifest&gt;
+                            &lt;addClasspath&gt;true&lt;/addClasspath&gt;
+                            &lt;mainClass&gt;com.gamya.mailengine.MailEngine&lt;/mainClass&gt;
+                        &lt;/manifest&gt;
+                    &lt;/archive&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;net.sf.jt400&lt;/groupId&gt;
+            &lt;artifactId&gt;jt400-full&lt;/artifactId&gt;
+            &lt;version&gt;4.7.0&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;javax&lt;/groupId&gt;
+            &lt;artifactId&gt;javaee-api&lt;/artifactId&gt;
+            &lt;version&gt;7.0&lt;/version&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;</tt></pre>
+</div></div>
+<div class="paragraph"><p>Buat file MailEngine.java dengan isi seperti ini:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>/*
+ * Copyright 2013 Samuel Franklyn &lt;sfranklyn@gmail.com&gt;.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.gamya.mailengine;
+
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.AS400Text;
+import com.ibm.as400.access.CharacterFieldDescription;
+import com.ibm.as400.access.DataQueue;
+import com.ibm.as400.access.DataQueueEntry;
+import com.ibm.as400.access.ErrorCompletingRequestException;
+import com.ibm.as400.access.IllegalObjectTypeException;
+import com.ibm.as400.access.ObjectDoesNotExistException;
+import com.ibm.as400.access.Record;
+import com.ibm.as400.access.RecordFormat;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+public class MailEngine {
+
+    private static final Logger logger = Logger.getLogger(MailEngine.class.getName());
+    private final Properties configProperties;
+
+    public static void main(String[] args) {
+        MailEngine mailEngine = new MailEngine();
+        mailEngine.readQueue();
+    }
+
+    public MailEngine() {
+        configProperties = new Properties();
+        InputStream inputStream = this.getClass().getClassLoader().
+                getResourceAsStream("config.properties");
+        try {
+            configProperties.load(inputStream);
+            FileHandler fileHandler = new FileHandler("log.xml");
+            logger.addHandler(fileHandler);
+            logger.setLevel(Level.ALL);
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void sendMail(String from, String to, String subject, String text) {
+        final String username = configProperties.getProperty("mail.username");
+        final String password = configProperties.getProperty("mail.password");
+
+        Session session = Session.getInstance(configProperties,
+                new javax.mail.Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(from));
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse(to));
+            message.setSubject(subject);
+            message.setText(text);
+
+            Transport.send(message);
+        } catch (MessagingException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void readQueue() {
+        String systemName = configProperties.getProperty("as400.systemname");
+        String userName = configProperties.getProperty("as400.username");
+        String password = configProperties.getProperty("as400.password");
+        String dataQueue = configProperties.getProperty("as400.dataqueue");
+
+        AS400 as400 = new AS400(systemName, userName, password);
+        DataQueue dq = new DataQueue(as400, dataQueue);
+
+        CharacterFieldDescription fromFD
+                = new CharacterFieldDescription(new AS400Text(100, as400),
+                        "FROM");
+        CharacterFieldDescription toFD
+                = new CharacterFieldDescription(new AS400Text(100, as400),
+                        "TO");
+        CharacterFieldDescription subjectFD
+                = new CharacterFieldDescription(new AS400Text(100, as400),
+                        "SUBJECT");
+        CharacterFieldDescription textFD
+                = new CharacterFieldDescription(new AS400Text(700, as400),
+                        "TEXT");
+
+        RecordFormat recordFormat = new RecordFormat();
+        recordFormat.addFieldDescription(fromFD);
+        recordFormat.addFieldDescription(toFD);
+        recordFormat.addFieldDescription(subjectFD);
+        recordFormat.addFieldDescription(textFD);
+
+        String from;
+        String to;
+        String subject;
+        String text;
+        Record record;
+        try {
+            logger.log(Level.INFO, "Read mail data queue");
+            while (true) {
+                DataQueueEntry DQData = dq.read(-1);
+                record = recordFormat.getNewRecord(DQData.getData());
+                from = record.getField("FROM").toString().trim();
+                logger.log(Level.INFO, "From: {0}", from);
+                to = record.getField("TO").toString().trim();
+                logger.log(Level.INFO, "To: {0}", to);
+                subject = record.getField("SUBJECT").toString().trim();
+                logger.log(Level.INFO, "Subject: {0}", subject);
+                text = record.getField("TEXT").toString().trim();
+                logger.log(Level.INFO, "Text: {0}", text);
+                sendMail(from, to, subject, text);
+            }
+        } catch (AS400SecurityException | ErrorCompletingRequestException |
+                IOException | IllegalObjectTypeException |
+                InterruptedException | ObjectDoesNotExistException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+
+}</tt></pre>
+</div></div>
+<div class="paragraph"><p>Untuk bisa menjalankan program java ini anda harus menyesuaikan isi dari
+config.properties di direktori src/main/java/resources.
+Contoh isi dari config.properties</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>mail.username=user@gmail.com
+mail.password=password
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+mail.smtp.host=smtp.gmail.com
+mail.smtp.port=587
+as400.systemname=pub1.de
+as400.username=USER
+as400.password=PASSWORD
+as400.dataqueue=/QSYS.LIB/MAIL.LIB/MAILQ.DTAQ</tt></pre>
+</div></div>
+<div class="paragraph"><p>Untuk membuat file jar untuk menjalankan program java gunakan perintah berikut
+di command line.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ mvn clean package</tt></pre>
+</div></div>
+<div class="paragraph"><p>Untuk menjalankan jar gunakan perintah:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ mvn exec:java</tt></pre>
+</div></div>
+<div class="paragraph"><p>Lalu jalankan program program PGSEND di AS/400 untuk mengirim surat.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>===&gt;CALL PGSEND</tt></pre>
+</div></div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Version 1.0<br />
+Last updated 2014-05-03 16:40:51 WIB
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+     D QNAME           S             10A   INZ('MAILQ')
+     D LIB             S             10A   INZ('MAIL')
+     D QLEN            S              5  0 INZ(1000)
+      *
+     D MAILDS          DS
+     D  FROM                        100A
+     D  TO                          100A
+     D  SUBJECT                     100A
+     D  TEXT                        700A
+      *
+     C                   EVAL       FROM='sfranklyn@gmail.com'
+     C                   EVAL       TO='sfranklyn@gmail.com'
+     C                   EVAL       SUBJECT='Send mail from RPG'
+     C                   EVAL       TEXT='It Works'
+      *
+     C                   CALL      'QSNDDTAQ'
+     C                   PARM                    QNAME
+     C                   PARM                    LIB
+     C                   PARM                    QLEN
+     C                   PARM                    MAILDS
+      *
+     C                   EVAL      *INLR=*ON
+     C                   RETURN

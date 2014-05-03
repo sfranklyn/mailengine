@@ -1,0 +1,114 @@
+Mail Engine
+===========
+Samuel Franklyn <sfranklyn@gmail.com>
+v1.0, 2013-12
+
+
+Pengantar
+---------
+Mail engine adalah program Java yang memungkinkan program RPG di AS/400 untuk 
+mengirimkan email dengan mudah. Program Java di PC akan membaca data queue 
+di AS/400. Jika ada data dalam data queue maka akan dikirimkan email berdasarkan
+data tersebut. Program RPG di AS/400 hanya perlu menuliskan data ke dalam 
+data queue untuk mengirimkan email.
+
+
+Perangkat Lunak
+---------------
+Dalam menuliskan program digunakan perangkat lunak berikut:
+
+1. Java SDK versi 7
+2. Maven versi 3.1.1
+3. NetBeans 8
+
+Silahkan melakukan instalasi perangkat lunak diatas sesuai dengan petunjuk 
+dari situs mereka.
+
+
+Mail Engine
+-----------
+Untuk melakukan test program maka penulis membuat library MAIL di AS/400.
+
+---------------
+===>CRTLIB MAIL
+---------------
+
+Sesudah itu dibuat data queue.
+
+-----------------------------------------
+===>CRTDTAQ DTAQ(MAIL/MAILQ) MAXLEN(1000)
+-----------------------------------------
+
+Jadikan library MAIL sebagai current library dan buat source file QSRC. 
+Masuk ke dalam source file itu dengan WRKMBRPDM. Buatlah member PGSEND dengan 
+tipe RPGLE.
+
+-------------------------------------------------------
+===>CHGCURLIB MAIL
+===>CRTSRCPF FILE(QSRC)
+===>WRKMBRPDM FILE(MAIL/QSRC)
+===>STRSEU SRCFILE(MAIL/QSRC) SRCMBR(PGSEND) TYPE(RPGLE)
+--------------------------------------------------------
+
+Lalu masukkan code berikut:
+
+----------------------------------------
+include::../as400/QSRC.FILE/PGSEND.MBR[]
+----------------------------------------
+
+Refresh tampilan anda dengan F5 lalu compile member PGSEND dengan menggunakan 
+option 14.
+
+Saatnya membuat program java anda dengan menggunakan Maven. Jalankan perintah 
+berikut di command line
+
+--------------------------------------------------
+$ mvn archetype:generate \
+   -DarchetypeGroupId=org.apache.maven.archetypes \
+   -DarchetypeArtifactId=maven-archetype-quickstart \
+   -DarchetypeVersion=1.1
+--------------------------------------------------
+
+Isi nilai groupId dengan com.gamya, nilai artifactId dengan mailengine,
+nilai version dengan 1.0 dan nilai package dengan com.gamya.mailengine.
+Maven akan membuat file pom.xml, source file App.java dan AppTest.java.
+Hapuslah source file App.java dan AppTest.java.
+Sesuaikan isi file pom.xml anda hingga seperti dibawah ini:
+
+---------------------
+include::../pom.xml[]
+---------------------
+
+Buat file MailEngine.java dengan isi seperti ini:
+
+----------------------------------------------------------------
+include::../src/main/java/com/gamya/mailengine/MailEngine.java[]
+----------------------------------------------------------------
+
+Untuk bisa menjalankan program java ini anda harus menyesuaikan isi dari
+config.properties di direktori src/main/java/resources. 
+Contoh isi dari config.properties
+
+----------------------------------------------------------
+include::../src/main/resources/config.properties[]
+----------------------------------------------------------
+
+Untuk membuat file jar untuk menjalankan program java gunakan perintah berikut 
+di command line.
+
+-------------------
+$ mvn clean package
+-------------------
+
+Untuk menjalankan jar gunakan perintah:
+
+---------------
+$ mvn exec:java
+---------------
+
+Lalu jalankan program program PGSEND di AS/400 untuk mengirim surat.
+
+---------------
+===>CALL PGSEND
+---------------
+
